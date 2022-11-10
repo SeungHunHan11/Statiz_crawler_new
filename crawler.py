@@ -3,15 +3,15 @@ from html_table_parser import parser_functions
 import requests
 import pandas as pd
 import os 
-
+import csv
 
 def crawl(url):
 
 
     table=pd.read_html(url,
-    attrs={'class':'table table-striped table-responsive  table-condensed no-space table-bordered'})[0]
+    attrs={'class':'table table-striped table-responsive  table-condensed no-space table-bordered'})[0] #인코딩 옵션 추가 없을 때 한글 깨짐 현상
     df = pd.DataFrame(table).drop_duplicates()
-    df.dropna(axis=1,how='any',inplace=True)
+    #df.dropna(axis=1,how='any',inplace=True) 정상 데이터까지 삭제하는 오류. 임시 삭제
 
     return df
 
@@ -50,8 +50,13 @@ if __name__ == '__main__':
     2. 오류 발생시 종료 후 다시 실행 해보세요.
 
     기타 문의 및 건의사항은 
-
+    
     painsports1905@gmail.com 으로 보내주세요!
+    
+    * 주의: 팀 기록 크롤링의 경우 빈 데이터 열이 
+      추가로 크롤링 되는 오류가 있습니다.
+      빠른 시일 내에 수정하겠습니다.
+    
     '''
 
     prompt="""
@@ -101,7 +106,8 @@ if __name__ == '__main__':
 
                         os.makedirs(make_dirs,exist_ok=True)
                         full_path=os.path.join('./files',name+'.csv')
-                        table.to_csv(full_path,index=False)
+
+                        table.to_csv(full_path,index=False,encoding='euc-kr') 
                         print('\n {} 경로에 저장 성공!'.format(os.path.abspath(full_path)))
                         break
                     except:
@@ -110,9 +116,3 @@ if __name__ == '__main__':
         else:
             break
 
-
-        
-
-
-
-    
