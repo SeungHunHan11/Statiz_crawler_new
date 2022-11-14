@@ -4,16 +4,28 @@ import requests
 import pandas as pd
 import os 
 import csv
+import re
+import math
 
 def crawl(url):
-
-
+    
     table=pd.read_html(url,
     attrs={'class':'table table-striped table-responsive  table-condensed no-space table-bordered'})[0] #인코딩 옵션 추가 없을 때 한글 깨짐 현상
     df = pd.DataFrame(table).drop_duplicates()
+    col_dim=len(df.columns[0])
+
+    droplevels=[x for x in range(col_dim-1)]
+    if col_dim>1:
+        df.columns=df.columns.droplevel(level=droplevels)
+        
+    df=df.loc[:, ~(df.columns.str.contains('순')|df.columns.str.contains('Unnamed'))]
+    
+    df=df[df.loc[:,df.columns[0]]!=df.columns[0]]
+
     #df.dropna(axis=1,how='any',inplace=True) 정상 데이터까지 삭제하는 오류. 임시 삭제
 
     return df
+
 
 def will_save():
     error_count=0
@@ -52,10 +64,6 @@ if __name__ == '__main__':
     기타 문의 및 건의사항은 
     
     painsports1905@gmail.com 으로 보내주세요!
-    
-    * 주의: 팀 기록 크롤링의 경우 빈 데이터 열이 
-      추가로 크롤링 되는 오류가 있습니다.
-      빠른 시일 내에 수정하겠습니다.
     
     '''
 
@@ -116,3 +124,4 @@ if __name__ == '__main__':
         else:
             break
 
+# pyinstaller --icon=C:\Users\icako\Desktop\python\Statiz_crawler_new\statiz.ico --onefile crawler.py
